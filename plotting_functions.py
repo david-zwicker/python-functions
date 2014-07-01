@@ -552,8 +552,14 @@ if __name__ == "__main__":
 
         plt.loglog(test_x, test_y, '+')
 
-        log_slope_indicator( 10, 100, 0.5, 2., '1', '2', ec='red' )
-        log_slope_indicator( 100, 300, 2., 2., '1', '2', loc='upper' )
+        log_slope_indicator(
+            xmin=10, xmax=100, factor=0.5, exponent=2.,
+            label_x='1', label_y='2', ec='red'
+        )
+        log_slope_indicator(
+            xmin=100, xmax=300, factor=2., exponent=2.,
+            label_x='1', label_y='2', loc='upper'
+        )
 
         plt.show()
 

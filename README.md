@@ -1,4 +1,4 @@
 python-functions
 ================
 
-Miscellaneous python functions
+Miscellaneous python functions.

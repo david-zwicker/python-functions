@@ -138,4 +138,4 @@ if __name__ == "__main__":
         3.4567e-4, 3.4567e4, -3.4567e-4, -3.4567e4
     )
     for testval in testvalues:
-        print(testval, "\t", number2latex(testval, precision=3))
+        print("%s\t%s" % (testval, number2latex(testval, precision=3)))

@@ -555,4 +555,3 @@ class SteadyStateStreamPlot(object):
 
 if __name__ == "__main__":
     print('This file is intended to be used as a module.')
-    print('This code serves as a test for the defined methods.')

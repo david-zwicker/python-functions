@@ -340,7 +340,7 @@ class SteadyStateStreamPlot(object):
 
     def plot_stationarity_line(self, axis=0, step=None, **kwargs):
         """
-        plots the lines along which variable 1 is stationary
+        plots the lines along which the variable plotted on `axis` is stationary
         """
         
         if step is None:
@@ -356,18 +356,19 @@ class SteadyStateStreamPlot(object):
         eps[i_vary] = 1e-6
         
         def rhs(angle, point, step):
+            """ rhs of the differential equation """
             x = point + step*np.array([np.cos(angle), np.sin(angle)])
             return self.func(x)[axis]
         
         def ensure_trajectory(point, ds):
-        
+            """ make sure we are actually on the trajectory """
             angle = np.arctan2(ds[1], ds[0])
             step = norm(ds)
             angle = newton(rhs, x0=angle, args=(point, step))
             return point + step*np.array([np.cos(angle), np.sin(angle)])
                    
         def get_traj(point, direction):
-            
+            """ retrieve an array with trajectory points """
             x0, dx = np.array(point), direction
             xs = [x0]
             
@@ -465,6 +466,7 @@ class SteadyStateStreamPlot(object):
             plt.plot(traj[i_start::10, 0], traj[i_start::10, 1], '-', color=color, **kwargs)
 
             # indicate direction with an arrow in the middle
+            # TODO: calculate the midpoint based on actual pathlength
             i = int(0.5*len(traj)) #< midpoint
             try:
                 dx = np.sign(ds)*(traj[i+5] - traj[i-5])

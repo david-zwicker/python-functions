@@ -217,9 +217,9 @@ class FigureBase(mpl.figure.Figure):
         def _style_generator():
             """ helper function """
             while True:
-                res = {'color': icolor.next()}
+                res = {'color': next(icolor)}
                 if dashes is not None:
-                    res['linestyle'] = idashes.next()
+                    res['linestyle'] = next(idashes)
                 if extra is not None:
                     res.update(extra)
                 yield res

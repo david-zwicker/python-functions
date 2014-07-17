@@ -19,6 +19,7 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.colors as mclr
+from matplotlib.figure import Figure
 from matplotlib.ticker import FormatStrFormatter, FuncFormatter, MaxNLocator
 
 
@@ -33,7 +34,7 @@ __all__ = [
 GOLDEN_MEAN = 2/(np.sqrt(5) - 1)
 INCHES_PER_PT = 1.0/72.27 # Convert pt to inch
 
-# colors suitable for colorblinds
+# colors suitable for color-blind people
 #COLOR_BLUE = '#0072B2'
 COLOR_BLUE_SAFE = '#0673B7'
 COLOR_ORANGE_SAFE = '#EFE342'
@@ -92,7 +93,7 @@ def set_presentation_style_of_axis(axis, num_ticks=7, use_tex=True):
         axis.set_major_locator(MaxNLocator(num_ticks, steps=[1, 2, 5, 10]))
 
 
-class FigureBase(mpl.figure.Figure):
+class FigureBase(Figure):
     """ Extended version of a matplotlib figure """
 
     # factors used to determine the preferred number of ticks in each direction
@@ -498,7 +499,7 @@ if __name__ == "__main__":
 
     test_x = np.linspace(0, 10, 100)
 
-    # testplot with presentation style
+    # test plot with presentation style
     for fig in figures('test.pdf'):
         plt.plot(test_x, np.sin(test_x), "r", test_x, np.cos(test_x), "b")
         plt.xlabel("Coordinate $x$")

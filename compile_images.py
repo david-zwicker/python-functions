@@ -8,8 +8,8 @@ Basic Usage:
 
 Run `./compile_images --help` for more details.
 
-@copyright: David Zwicker <zwicker@pks.mpg.de>
-@date:      2012-05-24
+@copyright: David Zwicker <dzwicker@seas.harvard.edu>
+@date:      2014-07-10
 """
 
 import os

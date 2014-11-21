@@ -54,9 +54,12 @@ COLOR_LIST_SAFE = [
 ]
 COLOR_LIST = [COLOR_BLUE, COLOR_ORANGE, COLOR_GREEN, COLOR_RED, 'k']
 
+
+
 def shellquote(s):
     """ Quotes characters problematic for most shells """
     return pipes.quote(s)
+
 
 
 def set_presentation_style(fig=None, legend_frame=False, axes=None, scale=1.):
@@ -113,6 +116,7 @@ def set_presentation_style(fig=None, legend_frame=False, axes=None, scale=1.):
     fig.canvas.draw()
 
 
+
 def set_axis_color( ax=None, axis='y', color='r' ):
     """ Changes the color of an axis including the ticks and the label """
 
@@ -120,6 +124,7 @@ def set_axis_color( ax=None, axis='y', color='r' ):
         ax = plt.gca()
 
     ax.tick_params( axis=axis, color=color, labelcolor=color )
+
 
 
 def get_color_scheme(base_color, num=4, spread=1.):
@@ -133,6 +138,7 @@ def get_color_scheme(base_color, num=4, spread=1.):
         for dh in np.linspace( -0.5*spread, 0.5*spread, num, endpoint=False )
     ]])
     return mclr.hsv_to_rgb( res_hsv )[0]
+
 
 
 def get_color_iter(color=None):
@@ -150,6 +156,8 @@ def get_color_iter(color=None):
     return color_iter
 
 plot_colors = get_color_iter
+
+
 
 def get_style_iter(color=True, dashes=None, extra=None):
     """ Returns an interator of various parameters controlling the style
@@ -185,6 +193,8 @@ def get_style_iter(color=True, dashes=None, extra=None):
 
 plot_styles = get_style_iter
 
+
+
 def get_colormap(colors='rgb'):
     """ builds a segmented colormap with the color sequence given
     as a string """
@@ -198,6 +208,7 @@ def get_colormap(colors='rgb'):
     )
 
 
+
 def blend_colors(color, bg='w', alpha=0.5):
     """
     Blends two colors using a weight. Can be used for faking alpha
@@ -208,6 +219,7 @@ def blend_colors(color, bg='w', alpha=0.5):
 
     return alpha*np.asarray(blend_colors.to_rgb(color)) \
         + (1 - alpha)*np.asarray(blend_colors.to_rgb(bg))
+
 
 
 def reordered_legend(order=None, ax=None, *args, **kwargs):
@@ -225,6 +237,7 @@ def reordered_legend(order=None, ax=None, *args, **kwargs):
         labels = np.asarray(labels)
 
         ax.legend(handles[order], labels[order], *args, **kwargs)
+
 
 
 def scatter_barchart(data, labels=None, ax=None, barwidth=0.7, color=None):
@@ -269,6 +282,7 @@ def scatter_barchart(data, labels=None, ax=None, barwidth=0.7, color=None):
         plt.xticks(range(len(data)))
 
 
+
 def contour_to_hatched_patches(
         cntrset, hatch_colors, hatch_patterns, remove_contour=True
     ):
@@ -294,8 +308,9 @@ def contour_to_hatched_patches(
             ax.add_patch(p)
 
 
+
 def plot_length(xs, ys, w=0.1, **kwargs):
-    """ Plots a double arrow between the two given coordiantes """
+    """ Plots a double arrow between the two given coordinates """
 
     ax = kwargs.pop( 'ax', None )
     if ax is None:
@@ -316,9 +331,11 @@ def plot_length(xs, ys, w=0.1, **kwargs):
     ax.arrow( xs[1], ys[1], -dx, -dy, **arrowparams )
 
 
+
 def logspace(start, stop, *args, **kwargs):
     """ Distributes `num` numbers logarithmically between `start` and `stop`"""
     return np.exp(np.linspace(np.log(start), np.log(stop), *args, **kwargs))
+
 
 
 def log_slope_indicator(
@@ -396,6 +413,7 @@ def log_slope_indicator(
         )
 
 
+
 def plot_masked(x, y, mask, *args, **kwargs):
     """ plots a line given by points x, y using a mask
         if mask is NaN, no line is drawn, if the mask evaluates to True, a solid line
@@ -429,6 +447,18 @@ def plot_masked(x, y, mask, *args, **kwargs):
         plt.plot(x[start:], y[start:], style, label=label, *args, **kwargs)
     )
     return res
+
+
+
+def plot_hist_logscale(data, bins=10, data_range=None, **kwargs):
+    """ plots a histogram with logarithmic bin widths """
+    if data_range is None:
+        data_range = (data.min(), data.max())
+    bins = logspace(data_range[0], data_range[1], bins + 1)
+    res = plt.hist(data, bins=bins, **kwargs)
+    plt.xscale('log')
+    return res
+
 
 
 def get_hatched_image(values, stripe_width=0.05, orientation='/'):
@@ -524,11 +554,12 @@ if __name__ == "__main__":
     tests = (
 #         'safe_colors',
 #         'axis_color',
-        'scatter_barchart',
-        'presentation_style',
-        'log_slope_indicator',
-        'hatched_image',
-        'figures',
+#         'scatter_barchart',
+#         'presentation_style',
+#         'log_slope_indicator',
+#         'hatched_image',
+#         'figures',
+        'plot_hist_logscale',
     )
 
     if 'safe_colors' in tests:
@@ -612,4 +643,9 @@ if __name__ == "__main__":
 
         img = get_hatched_image(z, stripe_width=12, orientation='\\')
         plt.imshow(img)
+        plt.show()
+        
+    if 'plot_hist_logscale' in tests:
+        test_data = np.exp(np.random.uniform(0, 10, 1000))
+        plot_hist_logscale(test_data)
         plt.show()

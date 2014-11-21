@@ -15,7 +15,7 @@ from matplotlib.ticker import Locator
 from figure_presets import set_presentation_style_of_axis
 
 # import to make functions available in this namespace
-from latex_functions import number2latex, numbers2latex 
+from latex_functions import number2latex, numbers2latex  # @UnusedImport
 
 GOLDEN_MEAN = 2/(np.sqrt(5) - 1)
 

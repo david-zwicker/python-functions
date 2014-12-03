@@ -6,16 +6,24 @@ Created on Nov 21, 2014
 
 from __future__ import division
 
+import itertools
 import math
+import random
+import sys
 
 import numpy as np
 import scipy.stats
+import scipy.misc
 from scipy.optimize import newton
 from scipy.integrate import quad
 from scipy.special import gamma
-from scipy.misc import factorial  # @UnresolvedImport
 
 
+# make functions compatible with python 2 and 3
+if sys.version_info[0] > 2:
+    xrange = range
+
+# constants
 PI2 = 2*np.pi
 
 
@@ -53,6 +61,54 @@ def random_log_uniform(v_min, v_max, size):
 
 
 
+def _take_random_combinations_gen(data, r, num, repeat=False):
+    """ a generator yielding `num` random combinations of length `r` of the 
+    items in `data`. If `repeat` is False, none of the combinations is yielded
+    twice. Note that the generator will be caught in a infinite loop if there
+    are less then `num` possible combinations. """
+    count, seen = 0, set()
+    while True:
+        # choose a combination
+        s = tuple(sorted(random.sample(data, r)))
+        # check whether it has been seen already
+        if s in seen:
+            continue
+        # return the combination
+        yield s
+        # keep track of what combinations we have already seen
+        if not repeat:
+            seen.add(s)
+        # check how many we have produced
+        count += 1
+        if count >= num:
+            break
+                
+                
+                
+def take_combinations(iterable, r, num='all'):
+    """ returns a generator yielding at most `num` random combinations of
+    length `r` of the items in `data`. """
+    if num == 'all':
+        # yield all combinations
+        return itertools.combinations(iterable, r)
+    else:
+        # check how many combinations there are
+        data = list(iterable)
+        num_combs = scipy.misc.comb(len(data), r, exact=True)
+        if num_combs <= num:
+            # yield all combinations
+            return itertools.combinations(data, r)
+        elif num_combs <= 10*num:
+            # yield a chosen sample of the combinations
+            choosen = set(random.sample(xrange(num_combs), num))
+            gen = itertools.combinations(data, r)
+            return (v for k, v in enumerate(gen) if k in choosen)
+        else:
+            # yield combinations at random
+            return _take_random_combinations_gen(data, r, num)
+        
+
+
 def sampling_distribution_std(x, std, num):
     """
     Sampling distribution of the standard deviation, see
@@ -82,6 +138,7 @@ def sampling_distribution_cv(x, cv, num):
     x2 = x*x
 
     # calculate the sum
+    factorial = scipy.misc.factorial
     res = sum(
         factorial(num - 1)*gamma(0.5*(num - i))/factorial(num - 1 - i)/factorial(i)*
         num**(0.5*i)/(2**(0.5*i)*cv**i)/((1 + x2)**(0.5*i))

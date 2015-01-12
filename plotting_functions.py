@@ -88,16 +88,16 @@ def set_presentation_style(fig=None, legend_frame=False, axes=None, scale=1.):
 
         # adjust the frame around the image
         for spine in ax.spines.values():
-            spine.set_linewidth( 2.*scale )
+            spine.set_linewidth(2.*scale)
 
         # adjust all lines within the axes
         for line in ax.get_lines():
-            line.set_linewidth( 3./2.*scale*line.get_linewidth() )
+            line.set_linewidth(3./2.*scale*line.get_linewidth())
 
         # adjust all text objects
-        for text in ax.findobj( plt.Text ):
-            text.set_fontname( 'Helvetica' )
-            text.set_fontsize( 16*scale2 )
+        for text in ax.findobj(plt.Text):
+            text.set_fontname('Helvetica')
+            text.set_fontsize(16*scale2)
 
         # adjust the tick padding
         ax.tick_params(
@@ -109,7 +109,7 @@ def set_presentation_style(fig=None, legend_frame=False, axes=None, scale=1.):
         if legend is not None:
             legend.draw_frame(legend_frame)
             for line in legend.get_lines():
-                line.set_linewidth( 2.*scale )
+                line.set_linewidth(2.*scale)
 
 
     # redraw figure
@@ -117,27 +117,27 @@ def set_presentation_style(fig=None, legend_frame=False, axes=None, scale=1.):
 
 
 
-def set_axis_color( ax=None, axis='y', color='r' ):
+def set_axis_color(ax=None, axis='y', color='r'):
     """ Changes the color of an axis including the ticks and the label """
 
     if ax is None:
         ax = plt.gca()
 
-    ax.tick_params( axis=axis, color=color, labelcolor=color )
+    ax.tick_params(axis=axis, color=color, labelcolor=color)
 
 
 
 def get_color_scheme(base_color, num=4, spread=1.):
     """ Distributes num colors around the color wheel starting with a base
-    color and convering the fraction `spread` of the circle """
+    color and converting the fraction `spread` of the circle """
     base_rgb = mclr.colorConverter.to_rgb(base_color)
     base_rgb = np.reshape(np.array(base_rgb), (1, 1, 3))
-    base_hsv = mclr.rgb_to_hsv( base_rgb )[0, 0]
+    base_hsv = mclr.rgb_to_hsv(base_rgb)[0, 0]
     res_hsv = np.array([[
-        ( (base_hsv[0] + dh) % 1., base_hsv[1], base_hsv[2] )
-        for dh in np.linspace( -0.5*spread, 0.5*spread, num, endpoint=False )
+        ((base_hsv[0] + dh) % 1., base_hsv[1], base_hsv[2])
+        for dh in np.linspace(-0.5*spread, 0.5*spread, num, endpoint=False)
     ]])
-    return mclr.hsv_to_rgb( res_hsv )[0]
+    return mclr.hsv_to_rgb(res_hsv)[0]
 
 
 
@@ -160,7 +160,7 @@ plot_colors = get_color_iter
 
 
 def get_style_iter(color=True, dashes=None, extra=None):
-    """ Returns an interator of various parameters controlling the style
+    """ Returns an iterator of various parameters controlling the style
     of plots """
 
     # prepare the data
@@ -312,11 +312,11 @@ def contour_to_hatched_patches(
 def plot_length(xs, ys, w=0.1, **kwargs):
     """ Plots a double arrow between the two given coordinates """
 
-    ax = kwargs.pop( 'ax', None )
+    ax = kwargs.pop('ax', None)
     if ax is None:
         ax = plt.gca()
 
-    # set paramters of the arrow
+    # set parameters of the arrow
     arrowparams = {
         'head_width':2*w, 'head_length':w,
         'length_includes_head':True, 'shape':'full',
@@ -327,8 +327,8 @@ def plot_length(xs, ys, w=0.1, **kwargs):
     # plot two arrows to mimic double arrow
     dx = xs[1] - xs[0]
     dy = ys[1] - ys[0]
-    ax.arrow( xs[0], ys[0],  dx,  dy, **arrowparams )
-    ax.arrow( xs[1], ys[1], -dx, -dy, **arrowparams )
+    ax.arrow(xs[0], ys[0],  dx,  dy, **arrowparams)
+    ax.arrow(xs[1], ys[1], -dx, -dy, **arrowparams)
 
 
 
@@ -548,8 +548,8 @@ class MinorSymLogLocator(Locator):
 
 
 if __name__ == "__main__":
-    print( 'This file is intended to be used as a module.' )
-    print( 'This code serves as a test for the defined methods.' )
+    print('This file is intended to be used as a module.')
+    print('This code serves as a test for the defined methods.')
 
     tests = (
 #         'safe_colors',

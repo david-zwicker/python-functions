@@ -87,7 +87,7 @@ def _take_random_combinations_gen(data, r, num, repeat=False):
                 
 def take_combinations(iterable, r, num='all'):
     """ returns a generator yielding at most `num` random combinations of
-    length `r` of the items in `data`. """
+    length `r` of the items in `iterable`. """
     if num == 'all':
         # yield all combinations
         return itertools.combinations(iterable, r)
@@ -107,6 +107,53 @@ def take_combinations(iterable, r, num='all'):
             # yield combinations at random
             return _take_random_combinations_gen(data, r, num)
         
+
+
+def _take_random_product_gen(data, r, num, repeat=False):
+    """ a generator yielding `num` random combinations of length `r` of the 
+    items in `data`. If `repeat` is False, none of the combinations is yielded
+    twice. Note that the generator will be caught in a infinite loop if there
+    are less then `num` possible combinations. """
+    raise NotImplementedError
+    count, seen = 0, set()
+    while True:
+        # choose a combination
+        s = tuple(sorted(random.sample(data, r)))
+        # check whether it has been seen already
+        if s in seen:
+            continue
+        # return the combination
+        yield s
+        # keep track of what combinations we have already seen
+        if not repeat:
+            seen.add(s)
+        # check how many we have produced
+        count += 1
+        if count >= num:
+            break
+        
+                
+        
+def take_product(data, r, num='all'):
+    """ returns a generator yielding at most `num` random instances from the
+    product set of `r` times the `data` """ 
+    if num == 'all':
+        # yield all combinations
+        return itertools.product(data, repeat=r)
+    else:
+        # check how many combinations there are
+        num_items = len(data)**r
+        if num_items <= num:
+            # yield all combinations
+            return itertools.product(data, repeat=r)
+        elif num_items <= 10*num:
+            # yield a chosen sample of the combinations
+            choosen = set(random.sample(xrange(num_items), num))
+            gen = itertools.product(data, repeat=r)
+            return (v for k, v in enumerate(gen) if k in choosen)
+        else:
+            # yield combinations at random
+            return _take_random_product_gen(data, r, num)
 
 
 def sampling_distribution_std(x, std, num):

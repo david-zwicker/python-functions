@@ -6,6 +6,7 @@ Created on Nov 21, 2014
 
 from __future__ import division
 
+import fractions
 import itertools
 import math
 import random
@@ -154,6 +155,22 @@ def take_product(data, r, num='all'):
         else:
             # yield combinations at random
             return _take_random_product_gen(data, r, num)
+
+
+
+def euler_phi(n):
+    """ evaluates the Euler phi function for argument `n`
+    See http://en.wikipedia.org/wiki/Euler%27s_totient_function
+    Implementation based on http://stackoverflow.com/a/18114286/932593
+    """
+    amount = 0
+
+    for k in xrange(1, n + 1):
+        if fractions.gcd(n, k) == 1:
+            amount += 1
+
+    return amount
+
 
 
 def sampling_distribution_std(x, std, num):

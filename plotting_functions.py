@@ -240,6 +240,24 @@ def reordered_legend(order=None, ax=None, *args, **kwargs):
 
 
 
+def errorplot(x, y, yerr=None, fmt='', *args, **kwargs):
+    """
+    Creates an error plot in which y-errors are represented by a band instead
+    of individual errorbars
+    """
+    line = plt.plot(x, y, fmt, *args, **kwargs)[0]
+    if yerr is not None:
+        color = kwargs.pop('color', line.get_color())
+        alpha = kwargs.pop('alpha', 0.3)
+        shape_err = plt.fill_between(x, y - yerr, y + yerr, *args, color=color,
+                                     alpha=alpha,**kwargs)
+    else:
+        shape_err = None
+
+    return line, shape_err
+
+
+
 def scatter_barchart(data, labels=None, ax=None, barwidth=0.7, color=None):
     """
     Creates a plot of groups of data points, where the individual points

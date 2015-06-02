@@ -376,8 +376,8 @@ class FigureLatex(FigureBase):
                 # setup remaining parameters
         plt.rcParams.update({
           'axes.labelsize': font_size,
-          'text.fontsize': font_size,
           'font.family': 'serif',
+          'font.size': font_size,
           'legend.fontsize': font_size,
           'xtick.labelsize': 0.9*font_size,
           'ytick.labelsize': 0.9*font_size,
@@ -415,8 +415,8 @@ class FigurePresentation(FigureBase):
         # setup all parameters
         plt.rcParams.update({
           'axes.labelsize': font_size,
-          'text.fontsize': font_size,
           'font.family': 'sans-serif',
+          'font.size': font_size,
           'legend.fontsize': font_size,
           'xtick.labelsize': 0.9*font_size,
           'ytick.labelsize': 0.9*font_size,

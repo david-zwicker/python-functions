@@ -245,12 +245,19 @@ def errorplot(x, y, yerr=None, fmt='', *args, **kwargs):
     Creates an error plot in which y-errors are represented by a band instead
     of individual errorbars
     """
-    line = plt.plot(x, y, fmt, *args, **kwargs)[0]
-    if yerr is not None:
+    # plot the mean
+    if fmt != 'none':
+        line = plt.plot(x, y, fmt, *args, **kwargs)[0]
         color = kwargs.pop('color', line.get_color())
+    else:
+        line = None
+        color = kwargs.pop('color', None)
+        
+    # plot the deviation
+    if yerr is not None:
         alpha = kwargs.pop('alpha', 0.3)
         shape_err = plt.fill_between(x, y - yerr, y + yerr, *args, color=color,
-                                     alpha=alpha,**kwargs)
+                                     edgecolors='none', alpha=alpha, **kwargs)
     else:
         shape_err = None
 

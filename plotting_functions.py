@@ -256,6 +256,7 @@ def errorplot(x, y, yerr=None, fmt='', *args, **kwargs):
     # plot the deviation
     if yerr is not None:
         alpha = kwargs.pop('alpha', 0.3)
+        kwargs.pop('ls', None)  #< ls only applies to centerline
         shape_err = plt.fill_between(x, y - yerr, y + yerr, *args, color=color,
                                      edgecolors='none', alpha=alpha, **kwargs)
     else:

@@ -480,7 +480,14 @@ def plot_hist_logscale(data, bins=10, data_range=None, **kwargs):
     """ plots a histogram with logarithmic bin widths """
     if data_range is None:
         data_range = (data.min(), data.max())
-    bins = logspace(data_range[0], data_range[1], bins + 1)
+    
+    # try determining the bins
+    try:
+        bins = logspace(data_range[0], data_range[1], bins + 1)
+    except TypeError:
+        # `bins` might have been a numpy array already
+        pass
+    
     res = plt.hist(data, bins=bins, **kwargs)
     plt.xscale('log')
     return res

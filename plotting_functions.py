@@ -123,7 +123,7 @@ def set_axis_color(ax=None, axis='y', color='r'):
     if ax is None:
         ax = plt.gca()
 
-    ax.tick_params(axis=axis, color=color, labelcolor=color)
+    ax.tick_params(axis=axis, which='both', color=color, labelcolor=color)
 
 
 

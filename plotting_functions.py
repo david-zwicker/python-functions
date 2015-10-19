@@ -482,12 +482,16 @@ def plot_masked(x, y, mask, *args, **kwargs):
 
 def plot_hist_logscale(data, bins=10, data_range=None, **kwargs):
     """ plots a histogram with logarithmic bin widths """
+    # extract the positive part of the data
+    data_pos = data[data > 0]
+    
     if data_range is None:
-        data_range = (data.min(), data.max())
+        data_range = (data_pos.min(), data_pos.max())
     
     # try determining the bins
     try:
         bins = logspace(data_range[0], data_range[1], bins + 1)
+        print(bins)
     except TypeError:
         # `bins` might have been a numpy array already
         pass

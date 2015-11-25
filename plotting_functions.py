@@ -146,7 +146,7 @@ def get_color_iter(color=None):
     Transforms the given color into a cycle or returns default colors
     """
     if color is None:
-        color = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
+        color = COLOR_LIST
 
     try:
         color_iter = itertools.cycle(color)
@@ -240,29 +240,37 @@ def reordered_legend(order=None, ax=None, *args, **kwargs):
 
 
 
-def errorplot(x, y, yerr=None, fmt='', *args, **kwargs):
+def errorplot(x, y, yerr=None, fmt='', **kwargs):
     """
     Creates an error plot in which y-errors are represented by a band instead
     of individual errorbars
     """
+    label = kwargs.pop('label', None)
+    has_error = (yerr is not None)
+    
     # plot the mean
     if fmt != 'none':
-        line = plt.plot(x, y, fmt, *args, **kwargs)[0]
+        if has_error:
+            line_label = None
+        else:
+            line_label = label
+        line = plt.plot(x, y, fmt, line_label=line_label, **kwargs)[0]
         color = kwargs.pop('color', line.get_color())
     else:
         line = None
         color = kwargs.pop('color', None)
         
     # plot the deviation
-    if yerr is not None:
+    if has_error:
         alpha = kwargs.pop('alpha', 0.3)
         kwargs.pop('ls', None)  #< ls only applies to centerline
         
         y = np.asarray(y)
         yerr = np.asarray(yerr)
         
-        shape_err = plt.fill_between(x, y - yerr, y + yerr, *args, color=color,
-                                     edgecolors='none', alpha=alpha, **kwargs)
+        shape_err = plt.fill_between(x, y - yerr, y + yerr, color=color,
+                                     edgecolors='none', alpha=alpha, 
+                                     label=label, **kwargs)
     else:
         shape_err = None
 

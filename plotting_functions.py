@@ -254,7 +254,7 @@ def errorplot(x, y, yerr=None, fmt='', **kwargs):
             line_label = None
         else:
             line_label = label
-        line = plt.plot(x, y, fmt, line_label=line_label, **kwargs)[0]
+        line = plt.plot(x, y, fmt, label=line_label, **kwargs)[0]
         color = kwargs.pop('color', line.get_color())
     else:
         line = None

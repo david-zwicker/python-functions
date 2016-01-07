@@ -54,6 +54,34 @@ def logspace(start, end, num=None):
 
 
 
+def mean_std_online(arr_or_iter, ddof=0):
+    """ calculates the mean and the standard deviation of the given data.
+    If the data is an iterator, the values are calculated memory efficiently
+    with an online algorithm, which does not store all the intermediate data.
+    
+    `ddof` is the  delta degrees of freedom, which is used in the formula for
+        the standard deviation. 
+    """
+    iterator = iter(arr_or_iter)
+    value = next(iterator)
+    
+    n = 1
+    mean = np.asarray(value, np.double)
+    M2 = np.zeros_like(mean)
+     
+    for value in iterator:
+        n += 1
+        delta = value - mean
+        mean += delta / n
+        M2 += delta * (value - mean)
+
+    if n < 2:
+        return mean, float('nan');
+    else:
+        return mean, np.sqrt(M2 / (n - ddof))
+    
+    
+
 def random_log_uniform(v_min, v_max, size):
     """ returns random variables that a distributed uniformly in log space """
     log_min, log_max = np.log(v_min), np.log(v_max)

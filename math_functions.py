@@ -63,20 +63,29 @@ def mean_std_online(arr_or_iter, ddof=0):
         the standard deviation. 
     """
     iterator = iter(arr_or_iter)
-    value = next(iterator)
+    try:
+        value = next(iterator)
+    except StopIteration:
+        return np.nan, np.nan
     
+    # initialize the variables with the first value returned from the iterator
     n = 1
-    mean = np.asarray(value, np.double)
-    M2 = np.zeros_like(mean)
+    if hasattr(value, '__iter__'):
+        mean = np.asarray(value, np.double)
+        M2 = np.zeros_like(mean)
+    else:
+        mean = value
+        M2 = 0
      
+    # iterate over the data
     for value in iterator:
         n += 1
         delta = value - mean
         mean += delta / n
         M2 += delta * (value - mean)
 
-    if n < 2:
-        return mean, float('nan');
+    if n <= ddof:
+        return mean, np.nan
     else:
         return mean, np.sqrt(M2 / (n - ddof))
     

@@ -41,7 +41,8 @@ COLOR_RED = '#E6001C'
 #     COLOR_BLUE_SAFE, COLOR_RED_SAFE, COLOR_GREEN_SAFE, COLOR_ORANGE_SAFE, 'k'
 # ]
 
-# this list has been taken from Wong. Color blindness. Nat Methods (2011) vol. 8 (6) pp. 441
+# this list has been taken from
+# Wong. Color blindness. Nat Methods (2011) vol. 8 (6) pp. 441
 COLOR_LIST_SAFE = [
     '#0072B2', # Blue
     '#D55E00', # Vermillion
@@ -338,7 +339,10 @@ def contour_to_hatched_patches(
         if remove_contour:
             pathcollection.remove()
 
-    for patches, _, hp in zip(patches_list, cycle(hatch_colors), cycle(hatch_patterns)):
+    hatch_colors = cycle(hatch_colors)
+    hatch_patterns = cycle(hatch_patterns)
+
+    for patches, _, hp in zip(patches_list, hatch_colors, hatch_patterns):
         for p in patches:
             p.set_fc("none")
             p.set_ec("k")
@@ -453,9 +457,10 @@ def log_slope_indicator(
 
 
 def plot_masked(x, y, mask, *args, **kwargs):
-    """ plots a line given by points x, y using a mask
-        if mask is NaN, no line is drawn, if the mask evaluates to True, a solid line
-        is used, otherwise a dotted line is drawn.
+    """
+    plots a line given by points x, y using a mask
+    if `mask` is NaN, no line is drawn, if the mask evaluates to True,
+        a solid line is used, otherwise a dotted line is drawn.
     """
     label = kwargs.pop('label', None)
     close_gaps = kwargs.pop('close_gaps', False)
@@ -513,7 +518,8 @@ def plot_hist_logscale(data, bins=10, data_range=None, **kwargs):
 def get_hatched_image(values, stripe_width=0.05, orientation='/'):
     """
     Takes three dimensional boolean data and projects out the last dimension,
-    by using hatched regions to symbolize parts, where several variables are true
+    by using hatched regions to symbolize parts, where several variables are
+    true
     """
 
     if stripe_width < 1:
@@ -685,7 +691,8 @@ if __name__ == "__main__":
         plt.show()
 
     if 'hatched_image' in tests:
-        test_x, test_y = np.meshgrid(np.linspace(0, 10, 201), np.linspace(0, 10, 201))
+        test_x, test_y = np.meshgrid(np.linspace(0, 10, 201),
+                                     np.linspace(0, 10, 201))
         z = np.empty((201, 201, 2), np.bool)
         z[:, :, 0] = np.sin(test_x) > 0
         z[:, :, 1] = np.cos(test_y) > 0
@@ -698,3 +705,4 @@ if __name__ == "__main__":
         test_data = np.exp(np.random.uniform(0, 10, 1000))
         plot_hist_logscale(test_data)
         plt.show()
+        

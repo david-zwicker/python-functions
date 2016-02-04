@@ -22,7 +22,7 @@ from scipy.special import gamma
 
 # make functions compatible with python 2 and 3
 if sys.version_info[0] > 2:
-    xrange = range
+    xrange = range  # @ReservedAssignment
 
 # constants
 PI2 = 2*np.pi
@@ -44,8 +44,8 @@ def average_angles(data, period=PI2):
 
 
 def logspace(start, end, num=None):
-    """ Returns an ordered sequence of `num` numbers from `start` to `end`, which
-        are spaced logarithmically """
+    """ Returns an ordered sequence of `num` numbers from `start` to `end`,
+    which are spaced logarithmically """
 
     if num is None:
         return np.logspace(np.log(start), np.log(end), base=np.e)
@@ -53,8 +53,74 @@ def logspace(start, end, num=None):
         return np.logspace(np.log(start), np.log(end), num, base=np.e)
 
 
+    
+class StatisticsAccumulator(object):
+    """ class that can be used to calculate statistics of sets of arbitrarily
+    shaped data sets. This uses an online algorithm, allowing the data to be
+    added one after another """
+    
+    def __init__(self, ddof=0, shape=None, dtype=np.double):
+        """ initialize the accumulator
+        `ddof` is the  delta degrees of freedom, which is used in the formula 
+            for the standard deviation.
+        `shape` is the shape of the data. If omitted it will be read from the
+            first value
+        `dtype` is the numpy dtype of the interal accumulator
+        """ 
+        self.count = 0
+        self.ddof = ddof
+        
+        if shape is None:
+            self.mean = None
+            self._M2 = None
+        else:
+            self.mean = np.zeros(shape, dtype=dtype)
+            self._M2 = np.zeros(shape, dtype=dtype)
+            
+        
+    @property
+    def var(self):
+        """ return the variance """
+        if self.count <= self.ddof:
+            raise ValueError('Too few items to calculate variance')
+        else:
+            return self._M2 / (self.count - self.ddof)
+        
+        
+    @property
+    def std(self):
+        """ return the standard deviation """
+        return np.sqrt(self.var)
+            
+            
+    def add(self, value):
+        """ add a value to the accumulator """
+        if self.mean is None:
+            # state needs to be initialized
+            self.count = 1
+            if hasattr(value, '__iter__'):
+                self.mean = np.asarray(value, np.double)
+                self._M2 = np.zeros_like(self.mean)
+            else:
+                self.mean = value
+                self._M2 = 0
+            
+        else:
+            # updated internal state
+            self.count += 1
+            delta = value - self.mean
+            self.mean += delta / self.count
+            self._M2 += delta * (value - self.mean)
+            
+    
+    def add_many(self, arr_or_iter):
+        """ adds many values from an array or an iterator """
+        for value in arr_or_iter:
+            self.add(value)
+    
+    
 
-def mean_std_online(arr_or_iter, ddof=0):
+def mean_std_online(arr_or_iter, ddof=0, shape=None):
     """ calculates the mean and the standard deviation of the given data.
     If the data is an iterator, the values are calculated memory efficiently
     with an online algorithm, which does not store all the intermediate data.
@@ -62,32 +128,20 @@ def mean_std_online(arr_or_iter, ddof=0):
     `ddof` is the  delta degrees of freedom, which is used in the formula for
         the standard deviation. 
     """
-    iterator = iter(arr_or_iter)
-    try:
-        value = next(iterator)
-    except StopIteration:
-        return np.nan, np.nan
+    acc = StatisticsAccumulator(ddof=ddof, shape=shape)
+    acc.add_many(arr_or_iter)
     
-    # initialize the variables with the first value returned from the iterator
-    n = 1
-    if hasattr(value, '__iter__'):
-        mean = np.asarray(value, np.double)
-        M2 = np.zeros_like(mean)
+    if acc.mean is None:
+        mean = np.nan
     else:
-        mean = value
-        M2 = 0
-     
-    # iterate over the data
-    for value in iterator:
-        n += 1
-        delta = value - mean
-        mean += delta / n
-        M2 += delta * (value - mean)
-
-    if n <= ddof:
-        return mean, np.nan
-    else:
-        return mean, np.sqrt(M2 / (n - ddof))
+        mean = acc.mean
+    
+    try:
+        std = acc.std
+    except ValueError:
+        std = np.nan
+        
+    return mean, std
     
     
 
@@ -241,8 +295,10 @@ def sampling_distribution_cv(x, cv, num):
     # calculate the sum
     factorial = scipy.misc.factorial
     res = sum(
-        factorial(num - 1)*gamma(0.5*(num - i))/factorial(num - 1 - i)/factorial(i)*
-        num**(0.5*i)/(2**(0.5*i)*cv**i)/((1 + x2)**(0.5*i))
+        factorial(num - 1) * gamma(0.5*(num - i)) * num**(0.5*i) / (
+            factorial(num - 1 - i) * factorial(i) * 2**(0.5*i) * cv**i
+            * (1 + x2)**(0.5*i)
+        )
         for i in range(1 - num%2, num, 2)
     )
 
@@ -255,7 +311,8 @@ def sampling_distribution_cv(x, cv, num):
 
 
 
-def confidence_interval(value, distribution=None, args=None, guess=None, confidence=0.95):
+def confidence_interval(value, distribution=None, args=None, guess=None,
+                        confidence=0.95):
     """ returns the confidence interval of `value`, if its value was estimated
     `num` times from the `distribution` """
 

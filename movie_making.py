@@ -219,7 +219,8 @@ class Movie(object):
         ]
 
         # spawn the subprocess and capture its output
-        p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = subprocess.Popen(args, stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
         out = p.stdout.read()
         err = p.stderr.read()
 

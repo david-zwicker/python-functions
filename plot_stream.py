@@ -22,7 +22,8 @@ class SteadyStateStreamPlot(object):
         """
         `func` is the vector function that defines the 2D flow field.
         The function must accept and also return an array with 2 elements
-        `region` defines the region of interest for plotting [left, bottom, right, top].
+        `region` defines the region of interest for plotting. Four numbers need
+            to be specified: [left, bottom, right, top].
         """
         self.func = func
         self.region = region
@@ -199,7 +200,8 @@ class SteadyStateStreamPlot(object):
         return points
 
 
-    def get_steady_states_at_y_boundary(self, grid_points=32, loc='left', points=None):
+    def get_steady_states_at_y_boundary(self, grid_points=32, loc='left',
+                                        points=None):
         """
         finds steady state points along the y-boundary at position `loc`
         """
@@ -214,7 +216,8 @@ class SteadyStateStreamPlot(object):
             x0 = self.region[2]
             direction = -1
         
-        ys, dist = np.linspace(self.region[1], self.region[3], grid_points, retstep=True)
+        ys, dist = np.linspace(self.region[1], self.region[3], grid_points,
+                               retstep=True)
         
         # consider a horizontal boundary
         def func1D(y):
@@ -257,21 +260,27 @@ class SteadyStateStreamPlot(object):
 
             points = np.array([[]]) #< array that will contain all the points
             
-            xs, dx = np.linspace(self.region[0], self.region[2], grid_points, retstep=True)
-            ys, dy = np.linspace(self.region[1], self.region[3], grid_points, retstep=True)
+            xs, dx = np.linspace(self.region[0], self.region[2], grid_points,
+                                 retstep=True)
+            ys, dy = np.linspace(self.region[1], self.region[3], grid_points,
+                                 retstep=True)
             
             # check the border separately if requested
             if 'left' in self.region_constraint:
-                points = self.get_steady_states_at_y_boundary(grid_points, 'left', points)
+                points = self.get_steady_states_at_y_boundary(grid_points,
+                                                              'left', points)
                 xs = xs[1:] # skip this point in future calculations
             if 'bottom' in self.region_constraint:
-                points = self.get_steady_states_at_x_boundary(grid_points, 'lower', points)
+                points = self.get_steady_states_at_x_boundary(grid_points,
+                                                              'lower', points)
                 ys = ys[1:] # skip this point in future calculations
             if 'right' in self.region_constraint:
-                points = self.get_steady_states_at_y_boundary(grid_points, 'right', points)
+                points = self.get_steady_states_at_y_boundary(grid_points,
+                                                              'right', points)
                 xs = xs[:-1] # skip this point in future calculations
             if 'top' in self.region_constraint:
-                points = self.get_steady_states_at_x_boundary(grid_points, 'upper', points)
+                points = self.get_steady_states_at_x_boundary(grid_points,
+                                                              'upper', points)
                 ys = ys[:-1] # skip this point in future calculations
                         
             xs, ys = np.meshgrid(xs, ys)
@@ -297,7 +306,8 @@ class SteadyStateStreamPlot(object):
             
                     if points.size == 0:
                         points = guess[None, :]
-                    elif np.all(np.abs(points - guess[None, :]).sum(axis=1) > dist):
+                    elif np.all(np.abs(points - guess[None, :]).sum(axis=1)
+                                > dist):
                         points = np.vstack((points, guess))
             
             # determine stability of the steady states
@@ -311,7 +321,8 @@ class SteadyStateStreamPlot(object):
             stable = np.array(stable)
             unstable = np.array(unstable)
         
-            self.steady_states = (stable.reshape((-1, 2)), unstable.reshape((-1, 2)))
+            self.steady_states = (stable.reshape((-1, 2)),
+                                  unstable.reshape((-1, 2)))
         
         return self.steady_states
     
@@ -463,7 +474,8 @@ class SteadyStateStreamPlot(object):
                 i_start = int(point_margin/np.abs(ds))
             else:
                 i_start = 0
-            plt.plot(traj[i_start::10, 0], traj[i_start::10, 1], '-', color=color, **kwargs)
+            plt.plot(traj[i_start::10, 0], traj[i_start::10, 1], '-',
+                     color=color, **kwargs)
 
             # indicate direction with an arrow in the middle
             # TODO: calculate the midpoint based on actual pathlength
@@ -480,7 +492,8 @@ class SteadyStateStreamPlot(object):
             )
 
 
-    def plot_streamlines(self, point, angles=None, stable_direction=None, **kwargs):
+    def plot_streamlines(self, point, angles=None, stable_direction=None,
+                         **kwargs):
         """
         Plots streamlines starting from points around `point`.
         `angles` are given in degrees to avoid factors of pi
@@ -518,7 +531,8 @@ class SteadyStateStreamPlot(object):
                 
             x0 = point + np.abs(ds)*dx
             
-            self.plot_streamline(x0, ds=ds, endpoints=endpoints, skip_initial_points=True, **kwargs)
+            self.plot_streamline(x0, ds=ds, endpoints=endpoints,
+                                 skip_initial_points=True, **kwargs)
 
     
     def plot_heteroclinic_orbits(self, **kwargs):
@@ -551,7 +565,8 @@ class SteadyStateStreamPlot(object):
                 # start trajectories in both directions
                 for dx in (ds, -ds):
                     x0 = point + 1e-6*dx*eigenvectors[:, k]
-                    self.plot_streamline(x0, ds, endpoints=endpoints, skip_initial_points=True, **kwargs)
+                    self.plot_streamline(x0, ds, endpoints=endpoints,
+                                         skip_initial_points=True, **kwargs)
 
 
 

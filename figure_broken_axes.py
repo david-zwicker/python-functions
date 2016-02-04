@@ -15,7 +15,7 @@ def axes_broken_y(axes, upper_frac=0.5, break_frac=0.02, ybounds=None,
     specified values.
     """
     def breakmarks(axes, y_min, y_max, xwidth=0.008):
-        x1, y1, x2, y2 = axes.get_position().get_points().flatten().tolist()
+        x1, _, x2, _ = axes.get_position().get_points().flatten().tolist()
         segment_height = (y_max - y_min) / 3.
         xoffsets = [0, +xwidth, -xwidth, 0]
         yvalues  = [y_min + (i * segment_height) for i in range(4)]
@@ -52,25 +52,27 @@ def axes_broken_y(axes, upper_frac=0.5, break_frac=0.02, ybounds=None,
     for loc, spine in lower_axes.spines.items():
         if loc == 'top':
             spine.set_color('none')
+            
     upper_axes.get_xaxis().set_ticks_position('top')
     lower_axes.get_xaxis().set_ticks_position('bottom')
     plt.setp(upper_axes.get_xticklabels(), visible=False)
     breakmarks(upper_axes, y1 + lower_height, upper_bottom)
+    
     # Set ylims if ybounds are defined
     if ybounds:
         lower_axes.set_ylim(ymin1, ymax1)
         upper_axes.set_ylim(ymin2, ymax2)
         lower_axes.set_autoscaley_on(False)
         upper_axes.set_autoscaley_on(False)
-        upper_axes.yaxis.get_label().set_position((0, 1 - (0.5 /(upper_frac/(1+break_frac)))))
-        lower_axes.yaxis.get_label().set_position((0, 0.5 / ((1 - upper_frac)/(1+break_frac))))
+        
+        label_pos_upper = (0, 1 - (0.5 /(upper_frac/(1+break_frac))))
+        upper_axes.yaxis.get_label().set_position(label_pos_upper)
+        label_pos_lower = (0, 0.5 / ((1 - upper_frac)/(1+break_frac)))
+        lower_axes.yaxis.get_label().set_position(label_pos_lower)
+        
     # Make original axes invisible
     axes.set_xticks([])
     axes.set_yticks([])
-#     print upper_axes.yaxis.get_label().get_position()
-#     print lower_axes.yaxis.get_label().get_position()
-#     print axes.yaxis.get_label().get_position()
-#     print axes.yaxis.labelpad
     for loc, spine in axes.spines.items():
         spine.set_color('none')
     return upper_axes, lower_axes

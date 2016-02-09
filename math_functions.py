@@ -106,7 +106,7 @@ class StatisticsAccumulator(object):
                 self._M2 = 0
             
         else:
-            # updated internal state
+            # update internal state
             self.count += 1
             delta = value - self.mean
             self.mean += delta / self.count
@@ -143,6 +143,22 @@ def mean_std_online(arr_or_iter, ddof=0, shape=None):
         
     return mean, std
     
+    
+    
+def mean_std_frequency_table(values, frequencies, ddof=0):
+    """ calculates the mean and the standard deviation of the given data.
+    `ddof` is the  delta degrees of freedom, which is used in the formula for
+        the standard deviation. 
+    """
+    count = frequencies.sum()
+    sum1 = (values * frequencies).sum()
+    sum2 = (values**2 * frequencies).sum()
+    mean = sum1 / count
+    var = (sum2 - sum1**2 / count)/(count - ddof)
+    std = np.sqrt(var)
+        
+    return mean, std
+        
     
 
 def random_log_uniform(v_min, v_max, size):

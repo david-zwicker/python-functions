@@ -245,8 +245,13 @@ def errorplot(x, y, yerr=None, fmt='', **kwargs):
     """
     Creates an error plot in which y-errors are represented by a band instead
     of individual errorbars
+    
+    `subsample` allows to plot only a fraction of the actual data points in the
+        plot of the mean, while all data points are used for the envelope
+        showing the errorbars 
     """
     label = kwargs.pop('label', None)
+    subsample = kwargs.pop('subsample', 1)
     has_error = (yerr is not None)
     
     # plot the mean
@@ -255,7 +260,8 @@ def errorplot(x, y, yerr=None, fmt='', **kwargs):
             line_label = None
         else:
             line_label = label
-        line = plt.plot(x, y, fmt, label=line_label, **kwargs)[0]
+        line = plt.plot(x[::subsample], y[::subsample], fmt, label=line_label,
+                        **kwargs)[0]
         color = kwargs.pop('color', line.get_color())
     else:
         line = None

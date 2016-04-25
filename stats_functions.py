@@ -7,11 +7,7 @@ Created on Nov 21, 2014
 from __future__ import division
 
 import numpy as np
-import scipy.stats
-import scipy.misc
-from scipy.optimize import newton
-from scipy.integrate import quad
-from scipy.special import gamma
+from scipy import integrate, misc, optimize, special, stats
 
 
     
@@ -125,6 +121,31 @@ def mean_std_frequency_table(frequencies, values=None, ddof=0):
         
     return mean, std
         
+        
+
+def lognorm_mean_var_to_mu_sigma(mean, variance, definition='scipy'):
+    """ determines the parameters of the log-normal distribution such that the
+    distribution yields a given mean and variance. The optional parameter
+    `definition` can be used to choose a definition of the resulting parameters
+    that is suitable for the given software package. """
+    mean2 = mean**2
+    mu = mean2/np.sqrt(mean2 + variance)
+    sigma = np.sqrt(np.log(1 + variance/mean2))
+    if definition == 'scipy':
+        return mu, sigma
+    elif definition == 'numpy':
+        return np.log(mu), sigma
+    else:
+        raise ValueError('Unknown definition `%s`' % definition)
+
+
+
+def lognorm_mean_var(mean, variance):
+    """ returns a lognormal distribution parameterized by its mean and its
+    variance. """
+    scale, sigma = lognorm_mean_var_to_mu_sigma(mean, variance, 'scipy')
+    return stats.lognorm(scale=scale, s=sigma)
+
 
 
 def sampling_distribution_std(x, std, num):
@@ -139,7 +160,7 @@ def sampling_distribution_std(x, std, num):
     scale = np.sqrt(num)/std
     x *= scale
 
-    res = 2**(1 - 0.5*num)*x**(num - 1)*np.exp(-0.5*x*x)/gamma(0.5*num)
+    res = 2**(1 - 0.5*num)*x**(num - 1)*np.exp(-0.5*x*x)/special.gamma(0.5*num)
 
     return res*scale
 
@@ -156,9 +177,9 @@ def sampling_distribution_cv(x, cv, num):
     x2 = x*x
 
     # calculate the sum
-    factorial = scipy.misc.factorial
+    factorial = misc.factorial
     res = sum(
-        factorial(num - 1) * gamma(0.5*(num - i)) * num**(0.5*i) / (
+        factorial(num - 1) * special.gamma(0.5*(num - i)) * num**(0.5*i) / (
             factorial(num - 1 - i) * factorial(i) * 2**(0.5*i) * cv**i
             * (1 + x2)**(0.5*i)
         )
@@ -166,7 +187,7 @@ def sampling_distribution_cv(x, cv, num):
     )
 
     # multiply by the other terms
-    res *= 2./(np.sqrt(np.pi)*gamma(0.5*(num-1)))
+    res *= 2./(np.sqrt(np.pi)*special.gamma(0.5*(num-1)))
     res *= x**(num-2)/((1 + x2)**(0.5*num))
     res *= np.exp(-0.5*num/(cv**2)*x2/(1 + x2))
 
@@ -189,9 +210,9 @@ def confidence_interval(value, distribution=None, args=None, guess=None,
 
     def rhs(x):
         """ integrand """
-        return confidence - quad(distr, value-x, value+x)[0]
+        return confidence - integrate.quad(distr, value-x, value+x)[0]
 
-    res = newton(rhs, guess, tol=1e-4)
+    res = optimize.newton(rhs, guess, tol=1e-4)
     return res
 
 
@@ -202,7 +223,7 @@ def confidence_interval_mean(std, num, confidence=0.95):
     sem = std/np.sqrt(num) # estimate of the standard error of the mean
 
     # get confidence interval from student-t distribution
-    factor = scipy.stats.t(num - 1).ppf(0.5 + 0.5*confidence)
+    factor = stats.t(num - 1).ppf(0.5 + 0.5*confidence)
 
     return factor*sem
 
@@ -212,10 +233,10 @@ def confidence_interval_std(std, num, confidence=0.95):
     """ calculates the confidence interval of the standard deviation given a 
     standard deviation and a number of observations, assuming a normal
     distribution """
-    c = scipy.stats.chi(num - 1).ppf(0.5 + 0.5*confidence)
+    c = stats.chi(num - 1).ppf(0.5 + 0.5*confidence)
     lower_bound = np.sqrt(num - 1)*std/c
 
-    c = scipy.stats.chi(num - 1).ppf(0.5 - 0.5*confidence)
+    c = stats.chi(num - 1).ppf(0.5 - 0.5*confidence)
     upper_bound = np.sqrt(num - 1)*std/c
 
     return 0.5*(upper_bound - lower_bound)

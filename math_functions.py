@@ -39,14 +39,13 @@ def average_angles(data, period=PI2):
 
 
 
-def logspace(start, end, num=None):
+def logspace(start, end, num=None, dtype=None):
     """ Returns an ordered sequence of `num` numbers from `start` to `end`,
     which are spaced logarithmically """
-
     if num is None:
-        return np.logspace(np.log(start), np.log(end), base=np.e)
+        return np.logspace(np.log10(start), np.log10(end), dtype=dtype)
     else:
-        return np.logspace(np.log(start), np.log(end), num, base=np.e)
+        return np.logspace(np.log10(start), np.log10(end), num=num, dtype=dtype)
 
 
 

@@ -24,6 +24,19 @@ if sys.version_info[0] > 2:
 PI2 = 2*np.pi
 
 
+
+def xlog2x(x):
+    """ calculates x*np.log2(x) """
+    if x == 0:
+        return 0
+    else:
+        return x * np.log2(x)
+
+# vectorize the function above
+xlog2x = np.vectorize(xlog2x, otypes='d')
+
+
+
 def average_angles(data, period=PI2):
     """ averages a list of cyclic values (angles by default)
     data  The list of angles

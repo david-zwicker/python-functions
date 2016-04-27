@@ -455,6 +455,7 @@ def figure_display(
     plt.show()
 
 
+
 @contextmanager
 def figure_file(
         filename, FigureClass=None, crop_pdf=None, post_process=True,
@@ -479,6 +480,7 @@ def figure_file(
         plt.close(fig)
 
 
+
 def figures(filename, **kwargs):
     """ Generator yielding two figure instances producing a latex and a
     presentation representation of a plot """
@@ -491,6 +493,7 @@ def figures(filename, **kwargs):
         filename = name + style + extension
         with figure_file(filename, cls, **kwargs) as f:
             yield f
+            
 
 
 if __name__ == "__main__":

@@ -28,12 +28,21 @@ class StatisticsAccumulator(object):
         self.ddof = ddof
         
         if shape is None:
-            self.mean = None
+            self._mean = None
             self._M2 = None
         else:
-            self.mean = np.zeros(shape, dtype=dtype)
+            self._mean = np.zeros(shape, dtype=dtype)
             self._M2 = np.zeros(shape, dtype=dtype)
             
+        
+    @property
+    def mean(self):
+        """ return the mean """
+        if self.shape is None:
+            return self._mean
+        else:
+            return self._mean.reshape(self.shape)
+        
         
     @property
     def var(self):
@@ -52,22 +61,22 @@ class StatisticsAccumulator(object):
             
     def add(self, value):
         """ add a value to the accumulator """
-        if self.mean is None:
+        if self._mean is None:
             # state needs to be initialized
             self.count = 1
             if hasattr(value, '__iter__'):
-                self.mean = np.asarray(value, np.double)
-                self._M2 = np.zeros_like(self.mean)
+                self._mean = np.asarray(value, np.double)
+                self._M2 = np.zeros_like(self._mean)
             else:
-                self.mean = value
+                self._mean = value
                 self._M2 = 0
             
         else:
             # update internal state
             self.count += 1
-            delta = value - self.mean
-            self.mean += delta / self.count
-            self._M2 += delta * (value - self.mean)
+            delta = value - self._mean
+            self._mean += delta / self.count
+            self._M2 += delta * (value - self._mean)
             
     
     def add_many(self, arr_or_iter):

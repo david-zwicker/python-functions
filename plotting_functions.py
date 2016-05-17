@@ -243,8 +243,10 @@ def reordered_legend(order=None, ax=None, *args, **kwargs):
 
 def errorplot(x, y, yerr=None, fmt='', **kwargs):
     """
-    Creates an error plot in which y-errors are represented by a band instead
-    of individual errorbars
+    Creates an error plot in which y-errors are represented by a shaded area
+    instead of individual errorbars. This function accepts most arguments of the 
+    traditional matplotlib `errorbar` function and translates them.
+    Additionally, the following arguments are accepted
     
     `subsample` allows to plot only a fraction of the actual data points in the
         plot of the mean, while all data points are used for the envelope

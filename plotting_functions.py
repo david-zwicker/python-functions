@@ -260,9 +260,17 @@ def errorplot(x, y, yerr=None, fmt='', **kwargs):
             line_label = None
         else:
             line_label = label
-        line = plt.plot(x[::subsample], y[::subsample], fmt, label=line_label,
-                        **kwargs)[0]
+            
+        # convert data to numpy, in case they are not already. This is for
+        # instance important if x or y are pandas series, in which case the
+        # label might be set accidentally 
+        x_arr = np.asarray(x[::subsample])
+        y_arr = np.asarray(y[::subsample])
+        
+        # plot the line with the given properties
+        line = plt.plot(x_arr, y_arr, fmt, label=line_label, **kwargs)[0]
         color = kwargs.pop('color', line.get_color())
+        
     else:
         line = None
         color = kwargs.pop('color', None)

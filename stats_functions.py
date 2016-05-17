@@ -16,25 +16,34 @@ class StatisticsAccumulator(object):
     shaped data sets. This uses an online algorithm, allowing the data to be
     added one after another """
     
-    def __init__(self, ddof=0, shape=None, dtype=np.double):
+    def __init__(self, ddof=0, shape=None, dtype=np.double, ret_cov=False):
         """ initialize the accumulator
         `ddof` is the  delta degrees of freedom, which is used in the formula 
             for the standard deviation.
         `shape` is the shape of the data. If omitted it will be read from the
             first value
         `dtype` is the numpy dtype of the interal accumulator
+        `ret_cov` determines whether the covariances are also calculated
         """ 
         self.count = 0
         self.ddof = ddof
+        self.dtype = dtype
+        self.ret_cov = ret_cov
         
         if shape is None:
+            self.shape = None
             self._mean = None
             self._M2 = None
         else:
-            self._mean = np.zeros(shape, dtype=dtype)
-            self._M2 = np.zeros(shape, dtype=dtype)
+            self.shape = shape
+            size = np.prod(shape)
+            self._mean = np.zeros(size, dtype=dtype)
+            if ret_cov:
+                self._M2 = np.zeros((size, size), dtype=dtype)
+            else:
+                self._M2 = np.zeros(size, dtype=dtype)
             
-        
+            
     @property
     def mean(self):
         """ return the mean """
@@ -45,12 +54,30 @@ class StatisticsAccumulator(object):
         
         
     @property
+    def cov(self):
+        """ return the variance """
+        if self.count <= self.ddof:
+            raise RuntimeError('Too few items to calculate variance')
+        elif not self.ret_cov:
+            raise ValueError('The covariance matrix was not calculated')
+        else:
+            return self._M2 / (self.count - self.ddof)
+        
+        
+    @property
     def var(self):
         """ return the variance """
         if self.count <= self.ddof:
-            raise ValueError('Too few items to calculate variance')
+            raise RuntimeError('Too few items to calculate variance')
+        elif self.ret_cov:
+            var = np.diag(self._M2) / (self.count - self.ddof)
         else:
-            return self._M2 / (self.count - self.ddof)
+            var = self._M2 / (self.count - self.ddof)
+
+        if self.shape is None:
+            return var
+        else:
+            return var.reshape(self.shape)
         
         
     @property
@@ -59,24 +86,46 @@ class StatisticsAccumulator(object):
         return np.sqrt(self.var)
             
             
+    def _initialize(self, value):
+        """ initialize the internal state with a given value """
+        # state needs to be initialized
+        self.count = 1
+        if hasattr(value, '__iter__'):
+            # make sure the value is a numpy array
+            value_arr = np.asarray(value, self.dtype)
+            self.shape = value_arr.shape
+            size = value_arr.size
+
+            # store 1d version of it
+            self._mean = np.ravel(value)
+            if self.ret_cov:
+                self._M2 = np.zeros((size, size), self.dtype)
+            else:
+                self._M2 = np.zeros(size, self.dtype)
+        else:
+            self.shape = None
+            self._mean = value
+            self._M2 = 0
+        
+            
     def add(self, value):
         """ add a value to the accumulator """
         if self._mean is None:
-            # state needs to be initialized
-            self.count = 1
-            if hasattr(value, '__iter__'):
-                self._mean = np.asarray(value, np.double)
-                self._M2 = np.zeros_like(self._mean)
-            else:
-                self._mean = value
-                self._M2 = 0
+            self._initialize(value)
             
         else:
             # update internal state
+            if self.shape is not None:
+                value = np.ravel(value)
+            
             self.count += 1
             delta = value - self._mean
             self._mean += delta / self.count
-            self._M2 += delta * (value - self._mean)
+            if self.ret_cov:
+                self._M2 += ((self.count - 1) * np.outer(delta, delta)
+                            - self._M2 / self.count)
+            else:
+                self._M2 += delta * (value - self._mean)
             
     
     def add_many(self, arr_or_iter):

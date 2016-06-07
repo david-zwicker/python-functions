@@ -97,7 +97,7 @@ class StatisticsAccumulator(object):
             size = value_arr.size
 
             # store 1d version of it
-            self._mean = np.ravel(value)
+            self._mean = value.flatten()
             if self.ret_cov:
                 self._M2 = np.zeros((size, size), self.dtype)
             else:

@@ -399,7 +399,7 @@ def logspace(start, stop, *args, **kwargs):
 def log_slope_indicator(
         xmin=1., xmax=2., factor=None, ymax=None,
         exponent=1., label_x='', label_y='',
-        space=15, loc='lower', ax=None, **kwargs
+        space=15, loc='lower', ax=None, debug=False, **kwargs
     ):
     """
     Function adding a triangle to axes `ax`. This is useful for indicating
@@ -408,14 +408,14 @@ def log_slope_indicator(
         y = factor*x**exponent
     If supplied, the texts `label_x` and `label_y` are put next to the
     catheti. The parameter `loc` determines whether the catheti are
-    above or below the diagonal. Additionall kwargs can be used to
+    above or below the diagonal. Additionally, kwargs can be used to
     set the style of the triangle
     """
 
-    # prepare
+    # prepare the axes and determine 
     if ax is None:
         ax = plt.gca()
-    lower = (loc == 'lower') != (exponent < 0.)
+    lower = (loc == 'lower')
 
     if ymax is not None:
         factor = ymax/max(xmin**exponent, xmax**exponent)
@@ -424,19 +424,22 @@ def log_slope_indicator(
         factor = 1.
 
     # get triangle coordinates
-    y = factor*np.array((xmin, xmax))**exponent
+    y = factor*np.array((xmin, xmax), np.double)**exponent
     if lower:
         pts = np.array([[xmin, y[0]], [xmax, y[0]], [xmax, y[1]]])
     else:
         pts = np.array([[xmin, y[0]], [xmax, y[1]], [xmin, y[1]]])
 
+    if debug:
+        print('The coordinates of the log slope indicator are %s' % pts)
+
     # add triangle to axis
-    if not( 'facecolor' in kwargs or 'fc' in kwargs ):
+    if not('facecolor' in kwargs or 'fc' in kwargs):
         kwargs['facecolor'] = 'none'
     p = Polygon(pts, closed=True, **kwargs)
     ax.add_patch(p)
 
-    # labels
+    # add labels
     xt = np.exp(0.5*(np.log(xmin) + np.log(xmax)))
     #dx = (xmax/xmin)**0.1
     yt = np.exp(np.log(y).mean())

@@ -121,7 +121,10 @@ class Movie(object):
         Adds the data of a PIL image as a frame to the current movie.
         """
         if self.inverted:
-            import ImageOps
+            try:
+                import ImageOps
+            except ImportError:
+                from PIL import ImageOps
             image_inv = ImageOps.invert(image)
             self._add_file(image_inv.save)
         else:
@@ -141,7 +144,10 @@ class Movie(object):
             colormap = cm.gray
 
         # produce image
-        import Image
+        try:
+            import Image
+        except ImportError:
+            from PIL import Image
         import numpy as np
         grey_data = colormap(np.clip(data.T, 0, 1))
         im = Image.fromarray(np.uint8(grey_data*255))
